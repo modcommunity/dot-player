@@ -111,7 +111,7 @@ func join(key: String, display_name: String = "", peer_id: int = 0, tick: int = 
 		existing.peer_id = peer_id
 
 		if display_name != "":
-			existing.display_name = config.clean_name(display_name)
+			existing.display_name = _unique_name(display_name, key)
 
 		if not config.restore_on_reconnect:
 			existing.team = config.default_team
@@ -128,7 +128,7 @@ func join(key: String, display_name: String = "", peer_id: int = 0, tick: int = 
 	if full != null:
 		return DotResult.failure(full)
 
-	var record := DotPlayerRecord.make(key, config.clean_name(display_name), peer_id)
+	var record := DotPlayerRecord.make(key, _unique_name(display_name, key), peer_id)
 	record.joined_tick = tick
 	record.reconnected_tick = tick
 	record.team = config.default_team
@@ -251,7 +251,48 @@ func set_char(key: String, char_id: StringName) -> DotResult:
 
 
 func set_display_name(key: String, display_name: String) -> DotResult:
-	return _set_field(key, &"display_name", config.clean_name(display_name))
+	return _set_field(key, &"display_name", _unique_name(display_name, key))
+
+
+## Cleans a name and, when the session forbids duplicates, makes it unique.
+##
+## [b]It appends rather than refusing, and the difference is the whole reason the
+## setting is worth having.[/b] Refusing means telling somebody their name is taken —
+## possibly by a held seat belonging to a player who left ten minutes ago — and leaving
+## them to invent another one at a connect screen. "Ada (2)" is the answer every chat
+## system reached decades ago.
+##
+## [param key] is excluded from the comparison so that renaming yourself to the name you
+## already have is not a collision with yourself.
+func _unique_name(raw: String, key: String) -> String:
+	var name := config.clean_name(raw)
+
+	if config.allow_duplicate_names:
+		return name
+
+	if not _name_taken(name, key):
+		return name
+
+	for n in range(2, 100):
+		var candidate := "%s (%d)" % [name, n]
+		if not _name_taken(candidate, key):
+			return candidate
+
+	# A hundred people called the same thing. The key is unique by construction, so
+	# this terminates rather than looping, and it is visibly odd rather than silently
+	# identical — which is what somebody debugging it needs.
+	return "%s (%s)" % [name, key]
+
+
+func _name_taken(name: String, except_key: String) -> bool:
+	for other in _order:
+		if other == except_key:
+			continue
+
+		if (_records[other] as DotPlayerRecord).display_name == name:
+			return true
+
+	return false
 
 
 func set_meta_value(key: String, field: String, value: Variant) -> DotResult:

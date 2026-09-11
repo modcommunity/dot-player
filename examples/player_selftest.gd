@@ -13,7 +13,7 @@ extends Node
 ## [/codeblock]
 
 const SECTIONS := 8
-const CHECKS := 155
+const CHECKS := 159
 
 const RATE := 64
 
@@ -148,6 +148,11 @@ func _test_config() -> void:
 	)
 
 	_check(c.env_prefix() == "DOT_PLAYER_", "and it layers the family's way")
+	_check(
+		c.allow_duplicate_names,
+		"two people may share a name by default — refusing means telling somebody "
+		+ "their name is taken by a player who left ten minutes ago"
+	)
 	var applied := c.apply_dictionary({"max_players": 12, "default_team": "blue"})
 	_check(applied.size() == 2, "taking a dictionary")
 	_check(c.max_players == 12 and c.default_team == &"blue", "with both values through")
@@ -203,6 +208,25 @@ func _test_join_and_leave() -> void:
 	_check(not roster.remove("nobody").ok, "removing nobody is refused")
 
 	_check(roster.describe_lines().size() == 3, "and the roster describes itself")
+
+	# The setting that used to be declared and read by nothing.
+	var strict := DotPlayerConfig.new()
+	strict.allow_duplicate_names = false
+	var unique := _roster(strict)
+	var first := unique.join("a", "Ada")
+	var second := unique.join("b", "Ada")
+	_check(first.ok and second.ok, "a server forbidding duplicates still lets both in")
+	_check(
+		(second.value as DotPlayerRecord).display_name == "Ada (2)",
+		"and disambiguates rather than refusing, which is the answer every chat system "
+		+ "reached decades ago"
+	)
+	_check(
+		unique.set_display_name("b", "Ada").ok
+		and unique.get_record("b").display_name == "Ada (2)",
+		"and renaming yourself to what you already are is not a collision with yourself"
+	)
+	unique.queue_free()
 
 	roster.clear()
 	_check(roster.count() == 0, "and clears")
