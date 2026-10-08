@@ -63,7 +63,7 @@ func env_prefix() -> String:
 
 
 func cli_prefix() -> String:
-	return "player-"
+	return "--player-"
 
 
 func validate() -> DotResult:
