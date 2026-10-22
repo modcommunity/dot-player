@@ -1,0 +1,14 @@
+# comments
+# Baselines only shrink: scripts/<gate> --update lowers or drops entries and refuses to add.
+addons/dot_player/core/dot_player_config.gd::long_block	4
+addons/dot_player/core/dot_player_record.gd::long_block	5
+addons/dot_player/dot_player_plugin.gd::long_block	1
+addons/dot_player/nodes/dot_player.gd::banner	4
+addons/dot_player/nodes/dot_player.gd::long_block	9
+addons/dot_player/nodes/dot_player_component.gd::banner	2
+addons/dot_player/nodes/dot_player_component.gd::long_block	7
+addons/dot_player/runtime/dot_player_roster.gd::banner	6
+addons/dot_player/runtime/dot_player_roster.gd::long_block	11
+examples/player_selftest.gd::banner	4
+examples/player_selftest.gd::history	1
+examples/player_selftest.gd::long_block	1
