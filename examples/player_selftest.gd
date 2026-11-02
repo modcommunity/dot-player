@@ -13,7 +13,7 @@ extends Node
 ## [/codeblock]
 
 const SECTIONS := 8
-const CHECKS := 159
+const CHECKS := 160
 
 const RATE := 64
 
@@ -345,6 +345,7 @@ func _test_capacity() -> void:
 		"and a game that would rather free it immediately can say so"
 	)
 
+	_check(DotPlayerConfig.new().max_players == 0, "the default is unlimited, not the old 32")
 	var unlimited := DotPlayerConfig.new()
 	unlimited.max_players = 0
 	var open := _roster(unlimited)

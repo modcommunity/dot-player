@@ -7,7 +7,7 @@ extends DotConfig
 @export_group("Capacity")
 
 ## How many players the session holds. Zero is unlimited.
-@export_range(0, 1024, 1, "or_greater") var max_players: int = 32
+@export_range(0, 1024, 1, "or_greater") var max_players: int = 0
 
 ## How many of those may be bots.
 ##
