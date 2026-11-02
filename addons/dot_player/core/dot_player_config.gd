@@ -7,13 +7,13 @@ extends DotConfig
 @export_group("Capacity")
 
 ## How many players the session holds. Zero is unlimited.
-@export_range(0, 1024, 1) var max_players: int = 32
+@export_range(0, 1024, 1, "or_greater") var max_players: int = 32
 
 ## How many of those may be bots.
 ##
 ## Counted separately because a server that fills with bots and then refuses a person is
 ## a server nobody can join, and the fix is a cap rather than a rule about ordering.
-@export_range(0, 1024, 1) var max_bots: int = 0
+@export_range(0, 1024, 1, "or_greater") var max_bots: int = 0
 
 ## Whether a held seat counts towards [member max_players].
 ##
